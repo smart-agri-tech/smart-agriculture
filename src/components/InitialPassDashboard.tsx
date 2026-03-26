@@ -37,7 +37,7 @@ const InitialPassDashboard = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSensorData(prevData => ({
       ...prevData,
@@ -45,7 +45,7 @@ const InitialPassDashboard = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Submitting sensor data:', sensorData);
     // Here you would typically send the data to your backend

@@ -30,7 +30,7 @@ const RecordDetailView = () => {
     "Consider a light fertilizer application to boost nitrogen levels for maximum yield.",
   ];
 
-  const getNDVIColor = (value) => {
+  const getNDVIColor = (value: number) => {
     if (value < 0.1) return 'bg-red-500';
     if (value < 0.2) return 'bg-orange-500';
     if (value < 0.3) return 'bg-yellow-500';

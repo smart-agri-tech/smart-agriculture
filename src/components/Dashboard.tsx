@@ -111,12 +111,12 @@ const ComprehensiveDashboard = () => {
   const [metric, setMetric] = useState('ndvi');
   const [showReportModal, setShowReportModal] = useState(false);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setSensorData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmitSensorData = (e) => {
+  const handleSubmitSensorData = (e: React.FormEvent) => {
     e.preventDefault();
     alert('Sensor data submitted successfully!');
     setSensorData({ soilMoisture: '', temperature: '', humidity: '' });

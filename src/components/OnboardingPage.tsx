@@ -28,7 +28,7 @@ const indicators = [
 export default function OnboardingPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    name: '', farmTypes: [], otherFarmType: '', indicators: [], farmLocation: '', notificationFrequency: 'Weekly'
+    name: '', farmTypes: [] as string[], otherFarmType: '', indicators: [] as string[], farmLocation: '', notificationFrequency: 'Weekly'
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -50,8 +50,9 @@ export default function OnboardingPage() {
     }));
   };
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox'
@@ -60,7 +61,7 @@ export default function OnboardingPage() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {

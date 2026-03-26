@@ -11,7 +11,7 @@ const mockData = [
   { date: '2026-04-29', ndvi: 0.78, soilMoisture: 0.27, temperature: 26, satellitePass: true },
 ];
 
-const metricLabels = { ndvi: 'NDVI', soilMoisture: 'Soil Moisture', temperature: 'Temperature' };
+const metricLabels: Record<string, string> = { ndvi: 'NDVI', soilMoisture: 'Soil Moisture', temperature: 'Temperature' };
 
 const HistoricalDataView = () => {
   const router = useRouter();

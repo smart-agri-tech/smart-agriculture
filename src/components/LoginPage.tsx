@@ -18,7 +18,7 @@ const LoginPage = () => {
   const [subscribed, setSubscribed] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
