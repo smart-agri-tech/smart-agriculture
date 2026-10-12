@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Smart Agriculture / SA.TECH
 
-## Getting Started
+Vue 3 + Vite single-page app, styled with Tailwind CSS v4, using Supabase for auth and data.
 
-First, run the development server:
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
+bun run dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Create `.env.local` in the project root:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+VITE_SUPABASE_URL=https://<project>.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_...
+# Turns /check on in production builds (it is always on in dev).
+VITE_COMPLIANCE_CHECK_ENABLED=false
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`VITE_*` values are compiled into the browser bundle, so only use public keys here (never the Supabase secret key).
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command | What it does |
+|---|---|
+| `bun run dev` | Dev server on port 3000 |
+| `bun run build` | Type-check (`vue-tsc`) and build to `dist/` |
+| `bun run preview` | Serve the production build |
+| `bun run test` | Unit tests for the compliance rules (`src/lib/compliance`) |
+| `bun run lint` | ESLint |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`vue-tsc` needs Node.js on the `PATH`; it does not run under Bun alone.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Layout
 
-## Deploy on Vercel
+- `src/router.ts` — all routes, page titles, and the `/check` feature flag
+- `src/pages/` — one component per route
+- `src/components/` — shared pieces (`check/` for the compliance check, `dashboard/` for the dashboard and charts)
+- `src/lib/compliance/` — pure rules engine and `.ics` builder for the Farm Compliance Check
+- `src/data/farm.ts` — demo data shown on the dashboard
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Vercel builds with `vercel.json` (Vite, with a rewrite to `index.html` so deep links like `/check` work).
+Set the same `VITE_*` variables in the Vercel project and redeploy after changing them.
+
+The contact form posts to Formspree (`https://formspree.io/f/mgaolqwq`).
