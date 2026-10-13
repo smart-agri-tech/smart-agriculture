@@ -7,7 +7,7 @@ export const CONTROLLER = {
   /** Legal form, shown after the name. */
   legalForm: { en: 'self-employed professional (autónoma)', ca: 'professional autònoma', es: 'profesional autónoma' },
   taxId: 'Z1782216C',
-  address: 'Calle Barcelona, 20, Esc. 1, 2º 1ª, 08930 Sant Adrià de Besòs, Barcelona, Spain',
+  address: 'Calle Barcelona, 20, 08930 Sant Adrià de Besòs, Barcelona, Spain',
   email: 'info@smart-agriculture.tech',
 };
 

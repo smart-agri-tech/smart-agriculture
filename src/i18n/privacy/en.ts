@@ -4,6 +4,8 @@
  */
 
 export interface PolicySection {
+  /** Anchor for links such as /privacy#cookies. */
+  id?: string;
   title: string;
   paragraphs?: string[];
   items?: string[];
@@ -84,10 +86,12 @@ export const en = {
       ],
     },
     {
-      title: '8. Data stored in your browser',
+      id: 'cookies',
+      title: '8. Cookies and data stored in your browser',
       items: [
         'Your language choice (EN, CA or ES), so the site remembers it.',
         'Your sign-in session, if you log in, so you stay signed in.',
+        'That you have seen the cookie notice, so it is not shown again until this policy changes.',
         'We do not use analytics, advertising or tracking cookies.',
       ],
     },
@@ -108,6 +112,13 @@ export const en = {
       ],
     },
   ] as PolicySection[],
+
+  cookieNotice: {
+    label: 'Cookie notice',
+    text: 'We only use cookies and browser storage that the site needs to work: your language choice and, if you sign in, your session. No analytics or advertising.',
+    learnMore: 'Learn more',
+    ok: 'OK',
+  },
 
   /** Short first layer shown under every consent checkbox. */
   consent: {

@@ -73,10 +73,12 @@ export const es: PrivacyMessages = {
       ],
     },
     {
-      title: '8. Datos guardados en tu navegador',
+      id: 'cookies',
+      title: '8. Cookies y datos guardados en tu navegador',
       items: [
         'El idioma que eliges (EN, CA o ES), para que la web lo recuerde.',
         'Tu sesión, si inicias sesión, para que no tengas que volver a iniciarla.',
+        'Que ya has visto el aviso de cookies, para que no vuelva a mostrarse hasta que cambie esta política.',
         'No usamos cookies de analítica, publicidad ni seguimiento.',
       ],
     },
@@ -97,6 +99,13 @@ export const es: PrivacyMessages = {
       ],
     },
   ] as PolicySection[],
+
+  cookieNotice: {
+    label: 'Aviso de cookies',
+    text: 'Solo usamos las cookies y el almacenamiento del navegador que la web necesita para funcionar: el idioma que eliges y, si inicias sesión, tu sesión. Sin analítica ni publicidad.',
+    learnMore: 'Más información',
+    ok: 'Entendido',
+  },
 
   consent: {
     accept: 'He leído y acepto la',

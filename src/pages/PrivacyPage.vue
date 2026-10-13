@@ -40,7 +40,7 @@ onBeforeUnmount(() => (document.documentElement.lang = 'en'));
       <p class="text-sm text-gray-500 mt-2">{{ t.updated(updated) }}</p>
       <p class="text-gray-700 mt-6 leading-relaxed">{{ t.intro }}</p>
 
-      <section v-for="(s, i) in t.sections" :key="s.title" class="mt-10">
+      <section v-for="(s, i) in t.sections" :id="s.id" :key="s.title" class="mt-10 scroll-mt-6">
         <h2 class="text-lg font-bold mb-3">{{ s.title }}</h2>
         <div v-if="s.table" class="overflow-x-auto mb-3">
           <table class="w-full text-sm bg-white border border-gray-200 rounded-2xl overflow-hidden">

@@ -73,10 +73,12 @@ export const ca: PrivacyMessages = {
       ],
     },
     {
-      title: '8. Dades desades al teu navegador',
+      id: 'cookies',
+      title: '8. Galetes i dades desades al navegador',
       items: [
         "L'idioma que tries (EN, CA o ES), perquè el web el recordi.",
         "La teva sessió, si inicies sessió, perquè no l'hagis de tornar a iniciar.",
+        "Que ja has vist l'avís de galetes, perquè no es torni a mostrar fins que canviï aquesta política.",
         "No fem servir galetes d'analítica, de publicitat ni de seguiment.",
       ],
     },
@@ -97,6 +99,13 @@ export const ca: PrivacyMessages = {
       ],
     },
   ] as PolicySection[],
+
+  cookieNotice: {
+    label: 'Avís de galetes',
+    text: "Només fem servir les galetes i l'emmagatzematge del navegador que el web necessita per funcionar: l'idioma que tries i, si inicies sessió, la teva sessió. Sense analítica ni publicitat.",
+    learnMore: 'Més informació',
+    ok: "D'acord",
+  },
 
   consent: {
     accept: 'He llegit i accepto la',
