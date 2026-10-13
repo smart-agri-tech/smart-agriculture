@@ -22,7 +22,7 @@ describe('evaluate', () => {
   test('reproduces the reference result', () => {
     const r = evaluate(reference);
     expect(r.requirements.map(x => [x.name, x.status])).toEqual([
-      ['DUN 2027', 'required'],
+      ['DUN 2026', 'required'],
       ['CAP aid application', 'completed'],
       ['DAN 2026', 'likely'],
       ['QIE · farm records', 'check'],
@@ -42,11 +42,11 @@ describe('evaluate', () => {
     ]);
   });
 
-  test('confirmed dates are shown and every row carries a source', () => {
+  test('confirmed dates are shown, CAP stays a placeholder, every row carries a source', () => {
     const labels = Object.fromEntries(evaluate(reference).requirements.map(r => [r.id, r.deadlineLabel]));
     expect(labels).toEqual({
       dun: 'Feb–Apr 2027',
-      cap: 'Feb–Apr 2027',
+      cap: '[DATE]',
       dan: '20 January 2027',
       qie: 'Ongoing · electronic from 1 January 2027',
       fertilisation: 'Within 1 month of the operation',

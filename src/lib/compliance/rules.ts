@@ -95,7 +95,7 @@ export function applicableRequirements(a: Answers): Requirement[] {
   ): Requirement => ({ id, name, status, need, deadlineLabel: deadlineLabel(id), source: DEADLINES[id].source });
 
   if (!a.privateConsumptionOnly) {
-    reqs.push(make('dun', 'DUN 2027', 'required', 'Annual farm declaration'));
+    reqs.push(make('dun', 'DUN 2026', 'required', 'Annual farm declaration'));
   }
 
   if (a.schemes.includes('cap_submitted')) {

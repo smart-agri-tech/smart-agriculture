@@ -3,7 +3,7 @@ import type { RequirementId } from './types';
 /**
  * Deadline catalogue.
  *
- * Dates confirmed by the SA.TECH team on 13 Oct 2026. While `confirmed` is false
+ * Dates confirmed by the SA.TECH team on 13 Oct 2026 (CAP still unconfirmed). While `confirmed` is false
  * the UI shows a [DATE] placeholder and the .ics marks the event as "to confirm".
  */
 export interface Deadline {
@@ -28,18 +28,17 @@ const DUN_WINDOW = { opens: '2027-02-01', date: '2027-04-30', dateLabel: 'Feb–
 export const DEADLINES: Record<RequirementId, Deadline> = {
   dun: {
     id: 'dun',
-    label: 'DUN 2027 · annual farm declaration',
+    label: 'DUN 2026 · annual farm declaration',
     ...DUN_WINDOW,
     confirmed: true,
     source: 'Annual DUN Ordre',
   },
   cap: {
     id: 'cap',
-    // In Catalonia the CAP aid application is filed inside the DUN.
-    label: 'CAP aid application (filed with the DUN)',
-    ...DUN_WINDOW,
-    confirmed: true,
-    source: 'Annual DUN Ordre',
+    label: 'CAP aid application',
+    date: '2026-12-31',
+    confirmed: false,
+    source: 'Annual DUN Ordre (ARP/7/2026)',
   },
   dan: {
     id: 'dan',
