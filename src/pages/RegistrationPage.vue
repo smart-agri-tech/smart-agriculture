@@ -2,6 +2,8 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { supabase } from '@/lib/supabase';
+import { consentRecord } from '@/lib/legal';
+import ConsentCheckbox from '@/components/ConsentCheckbox.vue';
 import BrandLink from '@/components/BrandLink.vue';
 import SubscribedCard from '@/components/SubscribedCard.vue';
 
@@ -13,18 +15,30 @@ const isSkippingRegistration = ref(false);
 const subscribed = ref(false);
 const error = ref('');
 const loading = ref(false);
+const consent = ref(false);
+const consentMissing = ref(false);
 
 async function handleSubmit() {
   error.value = '';
+  consentMissing.value = !consent.value;
+  if (consentMissing.value) return;
   loading.value = true;
   try {
     if (isSkippingRegistration.value) {
       subscribed.value = true;
     } else {
+      const consentGiven = consentRecord();
       const { error: err } = await supabase.auth.signUp({
         email: email.value,
         password: password.value,
-        options: { data: { full_name: name.value } },
+        options: {
+          data: {
+            full_name: name.value,
+            // Proof of consent, kept with the account.
+            privacy_consent_at: consentGiven.consentAt,
+            privacy_policy_version: consentGiven.policyVersion,
+          },
+        },
       });
       if (err) throw err;
       router.push('/onboarding');
@@ -78,6 +92,7 @@ const inputClass = 'w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm
             <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input v-model="password" type="password" :class="inputClass" />
           </div>
+          <ConsentCheckbox v-model="consent" :purpose="isSkippingRegistration ? 'updates' : 'account'" :invalid="consentMissing" />
           <button type="submit" :disabled="loading" class="w-full bg-black text-white py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50">
             {{ loading ? 'Please wait...' : isSkippingRegistration ? 'Subscribe' : 'Create Account' }}
           </button>

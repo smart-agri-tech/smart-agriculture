@@ -19,6 +19,7 @@ const t = computed(() => MESSAGES[props.lang ?? chosen.value].footer);
         <RouterLink to="/#about" class="hover:text-gray-600">{{ t.about }}</RouterLink>
         <RouterLink to="/#contact" class="hover:text-gray-600">{{ t.contact }}</RouterLink>
         <RouterLink to="/login" class="hover:text-gray-600">{{ t.login }}</RouterLink>
+        <RouterLink to="/privacy" class="hover:text-gray-600">{{ t.privacy }}</RouterLink>
         <a href="https://www.linkedin.com/company/smart-agri-tec" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600">LinkedIn</a>
       </div>
     </div>

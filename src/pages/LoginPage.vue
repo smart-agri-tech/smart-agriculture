@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { supabase } from '@/lib/supabase';
+import { consentRecord } from '@/lib/legal';
+import ConsentCheckbox from '@/components/ConsentCheckbox.vue';
 import BrandLink from '@/components/BrandLink.vue';
 import SubscribedCard from '@/components/SubscribedCard.vue';
 
@@ -16,9 +18,15 @@ const error = ref('');
 const loading = ref(false);
 const subscribed = ref(false);
 const resetSent = ref(false);
+const consent = ref(false);
+const consentMissing = ref(false);
+// Signing in needs no consent; creating an account or subscribing does.
+const needsConsent = computed(() => !isLogin.value || isSubscription.value);
 
 async function handleSubmit() {
   error.value = '';
+  consentMissing.value = needsConsent.value && !consent.value;
+  if (consentMissing.value) return;
   loading.value = true;
   try {
     if (isSubscription.value) {
@@ -28,10 +36,18 @@ async function handleSubmit() {
       if (err) throw err;
       router.push('/dashboard');
     } else {
+      const consentGiven = consentRecord();
       const { error: err } = await supabase.auth.signUp({
         email: email.value,
         password: password.value,
-        options: { data: { full_name: name.value } },
+        options: {
+          data: {
+            full_name: name.value,
+            // Proof of consent, kept with the account.
+            privacy_consent_at: consentGiven.consentAt,
+            privacy_policy_version: consentGiven.policyVersion,
+          },
+        },
       });
       if (err) throw err;
       router.push('/onboarding');
@@ -159,9 +175,13 @@ const inputClass = 'w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm
             </div>
             <input v-model="password" type="password" :class="inputClass" required />
           </div>
+          <ConsentCheckbox v-if="needsConsent" v-model="consent" :purpose="isSubscription ? 'updates' : 'account'" :invalid="consentMissing" />
           <button type="submit" :disabled="loading" class="w-full bg-black text-white py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50">
             {{ loading ? 'Please wait...' : isSubscription ? 'Subscribe' : isLogin ? 'Sign In' : 'Create Account' }}
           </button>
+          <p v-if="!needsConsent" class="text-xs text-gray-400 text-center">
+            <a href="/privacy" target="_blank" rel="noopener" class="underline hover:no-underline">Privacy policy</a>
+          </p>
         </form>
 
         <div class="mt-5 text-center text-sm text-gray-500 space-y-2">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useLang } from '@/composables/useLang';
-import LangSwitch from './LangSwitch.vue';
+import LangSwitch from '@/components/LangSwitch.vue';
 
 defineProps<{ showRestart: boolean }>();
 defineEmits<{ restart: [] }>();

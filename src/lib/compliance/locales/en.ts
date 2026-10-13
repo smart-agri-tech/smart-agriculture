@@ -252,6 +252,7 @@ export const en = {
     about: 'About',
     contact: 'Contact',
     login: 'Login',
+    privacy: 'Privacy',
   },
 };
 

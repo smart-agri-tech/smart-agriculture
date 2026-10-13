@@ -1,19 +1,25 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
+import { consentRecord } from '@/lib/legal';
+import ConsentCheckbox from '@/components/ConsentCheckbox.vue';
 
 const form = reactive({ firstName: '', lastName: '', email: '', message: '' });
 const sent = ref(false);
 const loading = ref(false);
 const error = ref('');
+const consent = ref(false);
+const consentMissing = ref(false);
 
 async function handleSubmit() {
+  consentMissing.value = !consent.value;
+  if (!consent.value) return;
   loading.value = true;
   error.value = '';
   try {
     const res = await fetch('https://formspree.io/f/mgaolqwq', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ ...form, _subject: `New message from ${form.firstName} ${form.lastName}` }),
+      body: JSON.stringify({ ...form, ...consentRecord(), _subject: `New message from ${form.firstName} ${form.lastName}` }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.errors?.map((e: { message: string }) => e.message).join(', ') || 'Failed to send');
@@ -53,6 +59,7 @@ const inputClass = 'w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm
       <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
       <textarea v-model="form.message" placeholder="Write your message here" rows="6" :class="[inputClass, 'resize-none']" />
     </div>
+    <ConsentCheckbox v-model="consent" purpose="contact" :invalid="consentMissing" />
     <button type="submit" :disabled="loading" class="w-full bg-black text-white py-3 rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50">
       {{ loading ? 'Sending...' : 'Send Message' }}
     </button>

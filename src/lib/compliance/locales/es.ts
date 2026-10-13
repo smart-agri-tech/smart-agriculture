@@ -260,5 +260,6 @@ export const es: Messages = {
     about: 'Quiénes somos',
     contact: 'Contacto',
     login: 'Iniciar sesión',
+    privacy: 'Privacidad',
   },
 };

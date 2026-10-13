@@ -11,6 +11,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/login', component: () => import('./pages/LoginPage.vue') },
   { path: '/register', component: () => import('./pages/RegistrationPage.vue') },
   { path: '/reset-password', component: () => import('./pages/ResetPasswordPage.vue') },
+  { path: '/privacy', component: () => import('./pages/PrivacyPage.vue'), meta: { title: 'Privacy policy · Smart Agriculture' } },
   { path: '/onboarding', component: () => import('./pages/OnboardingPage.vue') },
   { path: '/dashboard', component: () => import('./pages/DashboardPage.vue') },
   { path: '/dashboard/record', component: () => import('./pages/RecordDetailPage.vue') },

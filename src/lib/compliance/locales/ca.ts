@@ -260,5 +260,6 @@ export const ca: Messages = {
     about: 'Qui som',
     contact: 'Contacte',
     login: 'Inicia sessió',
+    privacy: 'Privacitat',
   },
 };
