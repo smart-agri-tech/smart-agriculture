@@ -1,3 +1,5 @@
+import { MESSAGES, type Lang, type Messages } from './locales';
+
 /**
  * Key regulatory dates shown with live counters on the compliance check.
  *
@@ -6,7 +8,7 @@
  */
 
 export type CounterStyle =
-  /** Days, hours and minutes until the date: "80 d 06 h 32 m". */
+  /** Days, hours and minutes until the date: "80 d 06 h 32 m". Texts per language in `locales/*`. */
   | 'countdown'
   /** Whole days until the date: "starts in 445 days". */
   | 'starts'
@@ -14,67 +16,52 @@ export type CounterStyle =
   | 'opens';
 
 export interface KeyDate {
-  id: string;
-  /** Date as shown in the list. */
-  dateLabel: string;
-  title: string;
+  id: keyof Messages['keyDates'];
   /** When the obligation starts or the window opens. */
   at: string;
   /** When a filing window closes (end of that day); only for windows. */
   closes?: string;
   style: CounterStyle;
-  source: string;
+  source: keyof Messages['sources'];
 }
 
 export const KEY_DATES: KeyDate[] = [
   {
     id: 'phyto-electronic',
-    dateLabel: '1 Jan 2027',
-    title: 'Electronic phytosanitary register',
     at: '2027-01-01T00:00:00+01:00',
     style: 'countdown',
-    source: 'FEGA note of 6 Nov 2025',
+    source: 'fega',
   },
   {
     id: 'dan',
-    dateLabel: '20 Jan 2027',
-    title: 'DAN · annual nitrogen declaration',
     at: '2027-01-20T00:00:00+01:00',
     style: 'countdown',
-    source: 'Catalan nitrogen management rules (DAN)',
+    source: 'dan',
   },
   {
     id: 'fertilisation',
-    dateLabel: '1 Jan 2026',
-    title: 'Fertilisation records',
     at: '2026-01-01T00:00:00+01:00',
     style: 'countdown',
-    source: 'RD 1051/2022',
+    source: 'rd1051',
   },
   {
     id: 'treatments',
-    dateLabel: 'Since 2013',
-    title: 'Treatment register',
     at: '2013-01-01T00:00:00+01:00',
     style: 'countdown',
-    source: 'RD 1311/2012',
+    source: 'rd1311',
   },
   {
     id: 'cue',
-    dateLabel: '1 Jan 2028',
-    title: 'Digital farm notebook (CUE)',
     at: '2028-01-01T00:00:00+01:00',
     style: 'starts',
-    source: 'FEGA note of 6 Nov 2025',
+    source: 'fega',
   },
   {
     id: 'dun',
-    dateLabel: 'Feb–Apr 2027',
-    title: 'DUN · annual farm declaration',
     at: '2027-02-01T00:00:00+01:00',
     closes: '2027-05-01T00:00:00+02:00',
     style: 'opens',
-    source: 'Annual DUN Ordre',
+    source: 'annualDun',
   },
 ];
 
@@ -84,8 +71,6 @@ const DAY = 24 * HOUR;
 const YEAR = 365.25 * DAY;
 
 const pad = (n: number) => String(n).padStart(2, '0');
-const days = (n: number) => `${n} ${n === 1 ? 'day' : 'days'}`;
-const years = (n: number) => `${n} ${n === 1 ? 'year' : 'years'}`;
 
 export interface Counter {
   text: string;
@@ -94,28 +79,31 @@ export interface Counter {
 }
 
 /** Counter text for a key date at a given moment. Pure: pass `now` in. */
-export function counterFor(item: KeyDate, now: Date): Counter {
+export function counterFor(item: KeyDate, now: Date, lang: Lang = 'en'): Counter {
+  const words = MESSAGES[lang].counters;
   const start = new Date(item.at).getTime();
-  const t = now.getTime();
+  const time = now.getTime();
 
   if (item.closes) {
     const end = new Date(item.closes).getTime();
-    if (t < start) return { text: `opens in ${days(Math.floor((start - t) / DAY))}`, inForce: false };
-    if (t < end) return { text: `closes in ${days(Math.floor((end - t) / DAY))}`, inForce: true };
-    return { text: 'closed', inForce: false };
+    if (time < start) return { text: words.opensIn(words.days(Math.floor((start - time) / DAY))), inForce: false };
+    if (time < end) return { text: words.closesIn(words.days(Math.floor((end - time) / DAY))), inForce: true };
+    return { text: words.closed, inForce: false };
   }
 
-  if (t >= start) {
-    const elapsed = t - start;
-    return { text: `in force ${elapsed >= YEAR ? years(Math.floor(elapsed / YEAR)) : days(Math.floor(elapsed / DAY))}`, inForce: true };
+  if (time >= start) {
+    const elapsed = time - start;
+    const span = elapsed >= YEAR ? words.years(Math.floor(elapsed / YEAR)) : words.days(Math.floor(elapsed / DAY));
+    return { text: words.inForce(span), inForce: true };
   }
 
-  const left = start - t;
+  const left = start - time;
   if (item.style === 'countdown') {
     const d = Math.floor(left / DAY);
     const h = Math.floor((left % DAY) / HOUR);
     const m = Math.floor((left % HOUR) / MINUTE);
     return { text: `${d} d ${pad(h)} h ${pad(m)} m`, inForce: false };
   }
-  return { text: `${item.style === 'opens' ? 'opens' : 'starts'} in ${days(Math.floor(left / DAY))}`, inForce: false };
+  const span = words.days(Math.floor(left / DAY));
+  return { text: item.style === 'opens' ? words.opensIn(span) : words.startsIn(span), inForce: false };
 }

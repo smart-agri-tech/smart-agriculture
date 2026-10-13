@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { buildIcs, evaluate, type Answers } from './index';
-import { KEY_DATES, counterFor } from './keyDates';
+import { KEY_DATES, QUESTION_COUNT, buildIcs, counterFor, evaluate, questions, type Answers, type Lang } from './index';
 
 // The answers behind the reference result ("Farm Compliance Check · result.pdf").
 const reference: Answers = {
@@ -42,16 +41,24 @@ describe('evaluate', () => {
     ]);
   });
 
-  test('confirmed dates are shown, CAP stays a placeholder, every row carries a source', () => {
+  test('confirmed dates are shown and every row carries a source', () => {
     const labels = Object.fromEntries(evaluate(reference).requirements.map(r => [r.id, r.deadlineLabel]));
     expect(labels).toEqual({
       dun: 'Feb–Apr 2027',
-      cap: '[DATE]',
+      cap: '1 Feb – 15 May 2026',
       dan: '20 January 2027',
       qie: 'Ongoing · electronic from 1 January 2027',
       fertilisation: 'Within 1 month of the operation',
     });
     for (const req of evaluate(reference).requirements) expect(req.source.length).toBeGreaterThan(0);
+  });
+
+  test('DUN and CAP link to the official page in the matching language', () => {
+    const url = (lang: Lang, id: string) => evaluate(reference, lang).requirements.find(r => r.id === id)?.sourceUrl;
+    expect(url('en', 'cap')).toBe('https://tramits.gencat.cat/ca/tramits/tramits-temes/6497_Declaracio-unica-Agraria-DUN');
+    expect(url('es', 'dun')).toBe('https://tramits.gencat.cat/es/tramits/tramits-temes/6497_Declaracio-unica-Agraria-DUN');
+    expect(url('ca', 'dan')).toBeUndefined();
+    expect(evaluate(reference).requirements.find(r => r.id === 'cap')?.source).toBe('Ordre ARP/24/2026');
   });
 
   test('private consumption drops DUN', () => {
@@ -100,9 +107,21 @@ describe('buildIcs', () => {
     expect(ics).not.toContain('(date to confirm)');
   });
 
-  test('uses CRLF and folds long lines', () => {
-    expect(ics.endsWith('END:VCALENDAR\r\n')).toBe(true);
-    for (const line of ics.split('\r\n')) expect(line.length).toBeLessThanOrEqual(75);
+  test('uses CRLF and folds long lines by bytes, also with accents', () => {
+    const icsCa = buildIcs(evaluate(reference, 'ca').requirements, { now: new Date('2026-10-12T00:00:00Z'), monthlyStart: '2026-11-01', lang: 'ca' });
+    expect(icsCa).toContain('X-WR-CALNAME:Terminis normatius de l');
+    for (const out of [ics, icsCa]) {
+      expect(out.endsWith('END:VCALENDAR\r\n')).toBe(true);
+      for (const line of out.split('\r\n')) expect(new TextEncoder().encode(line).length).toBeLessThanOrEqual(75);
+    }
+  });
+
+  test('skips deadlines that have already passed', () => {
+    // A pending CAP application (deadline 15 May 2026) gets no event in October 2026.
+    const pending = evaluate({ ...reference, schemes: ['cap_pending'] }).requirements;
+    const out = buildIcs(pending, { now: new Date('2026-10-12T00:00:00Z'), monthlyStart: '2026-11-01' });
+    expect(out).not.toContain('UID:cap-');
+    expect(out.match(/BEGIN:VEVENT/g)?.length).toBe(4);
   });
 });
 
@@ -128,5 +147,52 @@ describe('key date counters', () => {
   test('the DUN window opens, then closes', () => {
     expect(text('dun', new Date('2027-03-01T12:00:00+01:00'))).toBe('closes in 60 days');
     expect(text('dun', new Date('2027-05-01T00:00:00+02:00'))).toBe('closed');
+  });
+});
+
+describe('languages', () => {
+  test('questions have every text in every language, with the new area bands and "Other"', () => {
+    for (const lang of ['en', 'ca', 'es'] as Lang[]) {
+      const qs = questions(lang);
+      expect(qs.length).toBe(QUESTION_COUNT);
+      for (const q of qs) {
+        expect(q.title.length).toBeGreaterThan(0);
+        for (const o of q.options) expect(o.label?.length).toBeGreaterThan(0);
+      }
+      const farm = qs.find(q => q.key === 'farmTypes')!;
+      expect(farm.options.find(o => o.value === 'other')?.freeText).toBe(true);
+      expect(farm.freeText?.key).toBe('farmTypesOther');
+      expect(qs.find(q => q.key === 'area')!.options.map(o => o.value)).toEqual(['lt1', '1to5', '5to10', '10to50', '50to200', 'gt200']);
+    }
+  });
+
+  test('the reference result in Catalan and Spanish', () => {
+    const ca = evaluate(reference, 'ca');
+    expect(ca.requirements.map(r => r.name)).toEqual([
+      'DUN 2026',
+      "Sol·licitud d'ajuts PAC",
+      'DAN 2026',
+      "QIE · registres de l'explotació",
+      'Registre de fertilització',
+    ]);
+    expect(ca.dataSummary).toBe('Els teus registres són a Excel, WhatsApp i paper');
+    expect(ca.burden.level).toBe('Alta');
+
+    const es = evaluate(reference, 'es');
+    expect(es.requirements.find(r => r.id === 'qie')?.need).toBe('Tratamientos, fertilización, riego');
+    expect(es.requirements.find(r => r.id === 'cap')?.deadlineLabel).toBe('1 feb – 15 may 2026');
+    expect(es.burden.summary).toBe('Has estimado de 10 a 20 horas al año');
+    // Scores do not depend on the language.
+    expect([ca.complianceScore, es.dataScore]).toEqual([72, 54]);
+  });
+
+  test('counters in Catalan and Spanish', () => {
+    const now = new Date('2026-10-12T18:28:00+02:00');
+    const text = (id: string, lang: Lang) => counterFor(KEY_DATES.find(k => k.id === id)!, now, lang).text;
+    expect(text('phyto-electronic', 'ca')).toBe('80 d 06 h 32 m');
+    expect(text('fertilisation', 'ca')).toBe('en vigor fa 284 dies');
+    expect(text('treatments', 'es')).toBe('en vigor desde hace 13 años');
+    expect(text('cue', 'es')).toBe('empieza en 445 días');
+    expect(text('dun', 'ca')).toBe("s'obre d'aquí a 111 dies");
   });
 });

@@ -1,8 +1,8 @@
 export type Region = 'catalonia' | 'other';
 
-export type FarmType = 'arable' | 'fruit' | 'olive' | 'vineyard' | 'horticulture' | 'livestock';
+export type FarmType = 'arable' | 'fruit' | 'olive' | 'vineyard' | 'horticulture' | 'livestock' | 'other';
 
-export type AreaBand = 'lt1' | '1to10' | '10to50' | '50to200' | 'gt200';
+export type AreaBand = 'lt1' | '1to5' | '5to10' | '10to50' | '50to200' | 'gt200';
 
 export type FertiliserUse = 'none' | 'mineral' | 'organic' | 'both';
 
@@ -23,6 +23,8 @@ export type TimeSpent = 'lt5' | '5to10' | '10to20' | 'gt20';
 export interface Answers {
   region: Region;
   farmTypes: FarmType[];
+  /** Free text for the "Other" farm type. */
+  farmTypesOther?: string;
   area: AreaBand;
   privateConsumptionOnly: boolean;
   fertiliser: FertiliserUse;
@@ -48,6 +50,8 @@ export interface Requirement {
   deadlineLabel: string;
   /** Legal source shown next to the deadline. Every deadline must carry one. */
   source: string;
+  /** Official page where the dates can be checked. */
+  sourceUrl?: string;
 }
 
 export interface Notice {
@@ -55,7 +59,7 @@ export interface Notice {
   text: string;
 }
 
-export type BurdenLevel = 'Low' | 'Medium' | 'High' | 'Very high';
+export type BurdenLevel = 'low' | 'medium' | 'high' | 'veryHigh';
 
 export interface Result {
   requirements: Requirement[];
@@ -64,5 +68,6 @@ export interface Result {
   complianceScore: number;
   dataScore: number;
   dataSummary: string;
-  burden: { level: BurdenLevel; percent: number; summary: string };
+  /** `level` is the translated label. */
+  burden: { level: string; percent: number; summary: string };
 }

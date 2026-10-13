@@ -2,10 +2,14 @@
 import { computed } from 'vue';
 import { EXCLUSIVE_OPTIONS, type Question } from '@/lib/compliance';
 
-const props = defineProps<{ question: Question; value: string | string[] | undefined }>();
-const emit = defineEmits<{ change: [value: string | string[]] }>();
+const props = defineProps<{ question: Question; value: string | string[] | undefined; text?: string }>();
+const emit = defineEmits<{ change: [value: string | string[]]; changeText: [text: string] }>();
 
 const selected = computed(() => (Array.isArray(props.value) ? props.value : props.value ? [props.value] : []));
+const showText = computed(() => props.question.options.some(o => o.freeText && selected.value.includes(o.value)));
+
+// Focus the free-text field as soon as it appears.
+const vFocus = { mounted: (el: HTMLElement) => el.focus() };
 
 function toggle(option: string) {
   if (!props.question.multi) return emit('change', option);
@@ -48,5 +52,16 @@ function toggle(option: string) {
         <span class="font-bold">{{ o.label }}</span>
       </button>
     </div>
+    <input
+      v-if="showText && question.freeText"
+      v-focus
+      type="text"
+      maxlength="100"
+      :value="text"
+      :placeholder="question.freeText.placeholder"
+      :aria-label="question.freeText.placeholder"
+      class="mt-3 w-full rounded-lg border border-gray-300 bg-white px-4 py-3.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-600/30 focus:border-emerald-600"
+      @input="emit('changeText', ($event.target as HTMLInputElement).value)"
+    />
   </fieldset>
 </template>

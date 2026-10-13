@@ -1,67 +1,41 @@
+import type { Messages } from './locales';
 import type { RequirementId } from './types';
 
 /**
- * Deadline catalogue.
+ * Deadline catalogue. Display texts live in `locales/*` (`deadlines`, `sources`, `ics.labels`).
  *
- * Dates confirmed by the SA.TECH team on 13 Oct 2026 (CAP still unconfirmed). While `confirmed` is false
- * the UI shows a [DATE] placeholder and the .ics marks the event as "to confirm".
+ * Dates confirmed by the SA.TECH team on 13 Oct 2026; CAP dates taken from the official
+ * DUN page on Tràmits Gencat (tràmit 6497). While `confirmed` is false the UI shows a
+ * [DATE] placeholder and the .ics marks the event as "to confirm".
  */
 export interface Deadline {
   id: RequirementId;
-  label: string;
   /** ISO date (YYYY-MM-DD) of the deadline, or null for continuous obligations. */
   date: string | null;
   /** First day of the filing window, when the obligation has one (YYYY-MM-DD). */
   opens?: string;
-  /** Overrides the formatted date in the deadline column, e.g. a filing window. */
-  dateLabel?: string;
   /** Monthly reminder instead of a single date (records that must be kept continuously). */
   monthly?: boolean;
   confirmed: boolean;
-  source: string;
+  source: keyof Messages['sources'];
+  /** Official page for checking the dates; `{lang}` becomes `ca` or `es`. */
+  url?: string;
 }
 
-// The DUN filing window runs February to April. The closing day is taken as 30 April;
-// check it against the DUN Ordre for each campaign.
-const DUN_WINDOW = { opens: '2027-02-01', date: '2027-04-30', dateLabel: 'Feb–Apr 2027' };
+const DUN_PAGE = 'https://tramits.gencat.cat/{lang}/tramits/tramits-temes/6497_Declaracio-unica-Agraria-DUN';
 
 export const DEADLINES: Record<RequirementId, Deadline> = {
-  dun: {
-    id: 'dun',
-    label: 'DUN 2026 · annual farm declaration',
-    ...DUN_WINDOW,
-    confirmed: true,
-    source: 'Annual DUN Ordre',
-  },
-  cap: {
-    id: 'cap',
-    label: 'CAP aid application',
-    date: '2026-12-31',
-    confirmed: false,
-    source: 'Annual DUN Ordre (ARP/7/2026)',
-  },
-  dan: {
-    id: 'dan',
-    label: 'DAN 2026 · annual nitrogen declaration',
-    date: '2027-01-20',
-    confirmed: true,
-    source: 'Catalan nitrogen management rules (DAN)',
-  },
-  qie: {
-    id: 'qie',
-    label: 'Electronic phytosanitary register becomes mandatory',
-    date: '2027-01-01',
-    confirmed: true,
-    source: 'RD 1311/2012; FEGA note of 6 Nov 2025',
-  },
-  fertilisation: {
-    id: 'fertilisation',
-    label: 'Fertilisation records · monthly check',
-    date: null,
-    monthly: true,
-    confirmed: true,
-    source: 'RD 1051/2022',
-  },
+  // The DUN filing window runs February to April; the closing day is taken as 30 April.
+  dun: { id: 'dun', opens: '2027-02-01', date: '2027-04-30', confirmed: true, source: 'dunOrdre', url: DUN_PAGE },
+  // CAP direct aid for 2026: 1 Feb – 15 May 2026, changes allowed until 31 May (Ordre ARP/24/2026).
+  cap: { id: 'cap', opens: '2026-02-01', date: '2026-05-15', confirmed: true, source: 'dunOrdre', url: DUN_PAGE },
+  dan: { id: 'dan', date: '2027-01-20', confirmed: true, source: 'dan' },
+  qie: { id: 'qie', date: '2027-01-01', confirmed: true, source: 'qie' },
+  fertilisation: { id: 'fertilisation', date: null, monthly: true, confirmed: true, source: 'rd1051' },
 };
 
 export const PLACEHOLDER_DATE = '[DATE]';
+
+export function officialUrl(d: Deadline, m: Messages): string | undefined {
+  return d.url?.replace('{lang}', m.officialLang);
+}

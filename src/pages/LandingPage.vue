@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import ContactForm from '@/components/ContactForm.vue';
+import SiteFooter from '@/components/SiteFooter.vue';
 
 const router = useRouter();
 
@@ -152,17 +153,6 @@ const features = [
     </section>
 
     <!-- Footer -->
-    <footer class="border-t border-gray-200 py-6">
-      <div class="max-w-6xl mx-auto px-6 flex items-center justify-between text-sm text-gray-400">
-        <span>© 2026 Smart Agriculture</span>
-        <div class="flex gap-6">
-          <a href="#features" class="hover:text-gray-600">Features</a>
-          <a href="#about" class="hover:text-gray-600">About</a>
-          <a href="#contact" class="hover:text-gray-600">Contact</a>
-          <RouterLink to="/login" class="hover:text-gray-600">Login</RouterLink>
-          <a href="https://www.linkedin.com/company/smart-agri-tec" target="_blank" rel="noopener noreferrer" class="hover:text-gray-600">LinkedIn</a>
-        </div>
-      </div>
-    </footer>
+    <SiteFooter lang="en" />
   </div>
 </template>

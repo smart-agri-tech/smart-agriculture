@@ -29,7 +29,8 @@ const routes: RouteRecordRaw[] = [
 export const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior: (to, _from, saved) => saved ?? (to.hash ? { el: to.hash } : { top: 0 }),
+  // Hash targets sit below the landing page's fixed 56px header.
+  scrollBehavior: (to, _from, saved) => saved ?? (to.hash ? { el: to.hash, top: 64 } : { top: 0 }),
 });
 
 router.afterEach(to => {
