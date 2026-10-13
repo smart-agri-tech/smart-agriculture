@@ -14,7 +14,7 @@ defineEmits<{ restart: [] }>();
         <span class="hidden sm:inline text-sm text-gray-500">5-minute Farm Compliance Check · Catalonia</span>
         <button
           v-if="showRestart"
-          class="text-sm font-bold text-gray-900 border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-50 transition-colors"
+          class="print:hidden text-sm font-bold text-gray-900 border border-gray-300 rounded-md px-4 py-2 hover:bg-gray-50 transition-colors"
           @click="$emit('restart')"
         >
           Start again

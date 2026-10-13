@@ -14,3 +14,11 @@ body {
 input, select, textarea {
   color: #171717;
 }
+
+@media print {
+  /* Keep score bars, badges and card backgrounds when printing or saving as PDF. */
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

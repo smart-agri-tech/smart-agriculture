@@ -8,6 +8,14 @@ import { STATUS_BADGE, capitalise, downloadIcs, inWords, plural, scoreColours } 
 const props = defineProps<{ result: Result }>();
 
 const open = computed(() => props.result.requirements.filter(r => r.status !== 'completed').length);
+// The browser's print dialog offers "Save as PDF"; the document title becomes the suggested file name.
+function saveAsPdf() {
+  const title = document.title;
+  document.title = 'Farm Compliance Map · SA.TECH';
+  window.addEventListener('afterprint', () => (document.title = title), { once: true });
+  window.print();
+}
+
 const burdenColour = computed(() => {
   const p = props.result.burden.percent;
   return scoreColours(p >= 70 ? 0 : p >= 40 ? 50 : 100);
@@ -16,15 +24,28 @@ const burdenColour = computed(() => {
 
 <template>
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-[4.5rem] py-8 sm:py-10">
-    <p class="text-xs font-bold uppercase tracking-wide text-emerald-700">Your result</p>
-    <h1 class="text-3xl sm:text-4xl font-black text-gray-900 mt-2">Your Farm Compliance Map</h1>
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wide text-emerald-700">Your result</p>
+        <h1 class="text-3xl sm:text-4xl font-black text-gray-900 mt-2">Your Farm Compliance Map</h1>
+      </div>
+      <button
+        class="print:hidden flex-none inline-flex items-center gap-2 text-sm font-bold text-white bg-emerald-700 rounded-md px-4 py-2.5 hover:bg-emerald-800 transition-colors"
+        @click="saveAsPdf"
+      >
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14" />
+        </svg>
+        Save as PDF
+      </button>
+    </div>
     <p class="text-lg text-gray-600 mt-2">
       Based on your {{ QUESTIONS.length }} answers, {{ inWords(result.requirements.length) }}
       {{ plural(result.requirements.length, 'requirement applies', 'requirements apply') }} to your farm and
       {{ inWords(result.risks) }} {{ plural(result.risks, 'needs', 'need') }} attention.
     </p>
 
-    <section class="grid gap-6 md:grid-cols-3 mt-6">
+    <section class="grid gap-6 md:grid-cols-3 print:grid-cols-3 mt-6">
       <ScoreCard
         title="Compliance readiness"
         :value="result.complianceScore"
@@ -50,13 +71,13 @@ const burdenColour = computed(() => {
       />
     </section>
 
-    <section class="bg-white rounded-lg p-6 mt-6">
+    <section class="bg-white rounded-lg p-6 mt-6 break-inside-avoid">
       <h2 class="text-lg font-bold text-gray-900 mb-4">What applies to your farm</h2>
       <p v-if="result.requirements.length === 0" class="text-gray-600">
         Based on your answers, none of the requirements we check apply to your farm.
       </p>
       <template v-else>
-        <ul class="md:hidden divide-y divide-gray-200 border-t border-gray-200">
+        <ul class="md:hidden print:hidden divide-y divide-gray-200 border-t border-gray-200">
           <li v-for="r in result.requirements" :key="r.id" class="py-4 text-sm">
             <div class="flex items-start justify-between gap-3">
               <span class="font-bold text-gray-900">{{ r.name }}</span>
@@ -69,7 +90,7 @@ const burdenColour = computed(() => {
             <p class="text-xs text-gray-400 mt-0.5">Source: {{ r.source }}</p>
           </li>
         </ul>
-        <div class="hidden md:block">
+        <div class="hidden md:block print:block">
           <table class="w-full text-sm">
             <thead>
               <tr class="text-left text-xs font-bold text-gray-600 border-b border-gray-200">
@@ -101,7 +122,7 @@ const burdenColour = computed(() => {
 
     <KeyDates />
 
-    <section class="grid gap-6 lg:grid-cols-[1fr_17rem] mt-6">
+    <section class="grid gap-6 lg:grid-cols-[1fr_17rem] mt-6 break-inside-avoid">
       <div class="bg-white rounded-lg p-6">
         <h2 class="text-lg font-bold text-gray-900 mb-3">What we noticed</h2>
         <ul class="space-y-3">
@@ -117,14 +138,14 @@ const burdenColour = computed(() => {
           </li>
         </ul>
       </div>
-      <div v-if="open > 0" class="bg-emerald-800 rounded-lg p-6 text-white">
+      <div v-if="open > 0" class="print:hidden bg-emerald-800 rounded-lg p-6 text-white">
         <h2 class="text-lg font-bold leading-snug">Put the dates in your calendar</h2>
         <p class="text-sm text-emerald-50 mt-3 leading-relaxed">
           {{ capitalise(inWords(open)) }} {{ plural(open, 'deadline', 'deadlines') }}, each with a reminder two weeks ahead.
           Works in Google Calendar, Outlook and Apple Calendar.
         </p>
         <button
-          class="mt-4 bg-white text-emerald-800 text-sm font-bold rounded-md px-5 py-2.5 hover:bg-emerald-50 transition-colors"
+          class="print:hidden mt-4 bg-white text-emerald-800 text-sm font-bold rounded-md px-5 py-2.5 hover:bg-emerald-50 transition-colors"
           @click="downloadIcs(result)"
         >
           Download calendar (.ics)
