@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { QUESTIONS, type Result } from '@/lib/compliance';
 import ScoreCard from './ScoreCard.vue';
+import KeyDates from './KeyDates.vue';
 import { STATUS_BADGE, capitalise, downloadIcs, inWords, plural, scoreColours } from './format';
 
 const props = defineProps<{ result: Result }>();
@@ -98,6 +99,8 @@ const burdenColour = computed(() => {
       </template>
     </section>
 
+    <KeyDates />
+
     <section class="grid gap-6 lg:grid-cols-[1fr_17rem] mt-6">
       <div class="bg-white rounded-lg p-6">
         <h2 class="text-lg font-bold text-gray-900 mb-3">What we noticed</h2>
@@ -130,9 +133,9 @@ const burdenColour = computed(() => {
     </section>
 
     <p class="text-xs text-gray-500 mt-6 leading-relaxed">
-      Deadlines are shown as placeholders until each one is confirmed against the published 2026 campaign. Sources: RD
-      1051/2022 (fertilisation records), RD 1311/2012 and the FEGA note of 6 November 2025 (phytosanitary records,
-      machine-readable from 1 January 2027), and the annual DUN Ordre.
+      Sources: RD 1051/2022 (fertilisation records), RD 1311/2012 and the FEGA note of 6 November 2025 (phytosanitary
+      records, machine-readable from 1 January 2027), Catalan nitrogen management rules (DAN), and the annual DUN Ordre.
+      Check each date against the official text before relying on it.
     </p>
   </main>
 </template>

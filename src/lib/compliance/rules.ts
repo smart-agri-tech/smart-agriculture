@@ -38,17 +38,21 @@ const BURDEN: Record<TimeSpent, { level: BurdenLevel; percent: number; hours: st
 const RISK_PENALTY = 14;
 const EXTRA_SOURCE_PENALTY = 8;
 
-export function deadlineLabel(id: RequirementId): string {
-  if (id === 'qie') return 'Ongoing';
-  if (id === 'fertilisation') return 'Within 1 month of the operation';
-  const d = DEADLINES[id];
-  if (!d.confirmed || !d.date) return PLACEHOLDER_DATE;
-  return new Date(`${d.date}T00:00:00Z`).toLocaleDateString('en-GB', {
+function formatDate(iso: string): string {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
     timeZone: 'UTC',
   });
+}
+
+export function deadlineLabel(id: RequirementId): string {
+  const d = DEADLINES[id];
+  if (id === 'fertilisation') return 'Within 1 month of the operation';
+  if (!d.confirmed || !d.date) return id === 'qie' ? 'Ongoing' : PLACEHOLDER_DATE;
+  if (id === 'qie') return `Ongoing · electronic from ${formatDate(d.date)}`;
+  return d.dateLabel ?? formatDate(d.date);
 }
 
 function usesDigitalOnly(methods: RecordMethod[]): boolean {
@@ -91,7 +95,7 @@ export function applicableRequirements(a: Answers): Requirement[] {
   ): Requirement => ({ id, name, status, need, deadlineLabel: deadlineLabel(id), source: DEADLINES[id].source });
 
   if (!a.privateConsumptionOnly) {
-    reqs.push(make('dun', 'DUN 2026', 'required', 'Annual farm declaration'));
+    reqs.push(make('dun', 'DUN 2027', 'required', 'Annual farm declaration'));
   }
 
   if (a.schemes.includes('cap_submitted')) {

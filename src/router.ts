@@ -2,8 +2,8 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 const DEFAULT_TITLE = 'satech';
 
-// [UNVERIFIED] deadline dates: keep /check off in production until each date
-// is confirmed against the 2026 campaign. Set VITE_COMPLIANCE_CHECK_ENABLED=true to ship.
+// /check is gated so it can be switched off in production without a code change.
+// Set VITE_COMPLIANCE_CHECK_ENABLED=true to show it.
 const complianceCheckEnabled = import.meta.env.DEV || import.meta.env.VITE_COMPLIANCE_CHECK_ENABLED === 'true';
 
 const routes: RouteRecordRaw[] = [

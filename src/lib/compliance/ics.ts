@@ -59,6 +59,7 @@ export function buildIcs(requirements: Requirement[], { now, monthlyStart }: Ics
     const summary = d.confirmed ? d.label : `${d.label} (date to confirm)`;
     const description = [
       req.need,
+      d.opens ? `Filing window opens ${d.opens}.` : '',
       `Source: ${d.source}.`,
       d.confirmed ? '' : 'This date has not yet been confirmed against the published 2026 campaign. Check it before relying on it.',
     ]

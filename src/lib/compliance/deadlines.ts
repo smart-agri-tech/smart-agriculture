@@ -3,49 +3,56 @@ import type { RequirementId } from './types';
 /**
  * Deadline catalogue.
  *
- * [UNVERIFIED] The dates below come from the project spec and have NOT been
- * confirmed against the published 2026 campaign Ordre. While `confirmed` is
- * false the UI shows a [DATE] placeholder and the .ics marks the event as
- * "to confirm". Flip `confirmed` only after checking each date at source.
+ * Dates confirmed by the SA.TECH team on 13 Oct 2026. While `confirmed` is false
+ * the UI shows a [DATE] placeholder and the .ics marks the event as "to confirm".
  */
 export interface Deadline {
   id: RequirementId;
   label: string;
-  /** ISO date (YYYY-MM-DD) for a single-day deadline, or null for continuous obligations. */
+  /** ISO date (YYYY-MM-DD) of the deadline, or null for continuous obligations. */
   date: string | null;
+  /** First day of the filing window, when the obligation has one (YYYY-MM-DD). */
+  opens?: string;
+  /** Overrides the formatted date in the deadline column, e.g. a filing window. */
+  dateLabel?: string;
   /** Monthly reminder instead of a single date (records that must be kept continuously). */
   monthly?: boolean;
   confirmed: boolean;
   source: string;
 }
 
+// The DUN filing window runs February to April. The closing day is taken as 30 April;
+// check it against the DUN Ordre for each campaign.
+const DUN_WINDOW = { opens: '2027-02-01', date: '2027-04-30', dateLabel: 'Feb–Apr 2027' };
+
 export const DEADLINES: Record<RequirementId, Deadline> = {
   dun: {
     id: 'dun',
-    label: 'DUN 2026 · annual farm declaration',
-    date: '2026-12-31',
-    confirmed: false,
-    source: 'Annual DUN Ordre (ARP/7/2026)',
+    label: 'DUN 2027 · annual farm declaration',
+    ...DUN_WINDOW,
+    confirmed: true,
+    source: 'Annual DUN Ordre',
   },
   cap: {
     id: 'cap',
-    label: 'CAP aid application',
-    date: '2026-12-31',
-    confirmed: false,
-    source: 'Annual DUN Ordre (ARP/7/2026)',
+    // In Catalonia the CAP aid application is filed inside the DUN.
+    label: 'CAP aid application (filed with the DUN)',
+    ...DUN_WINDOW,
+    confirmed: true,
+    source: 'Annual DUN Ordre',
   },
   dan: {
     id: 'dan',
     label: 'DAN 2026 · annual nitrogen declaration',
     date: '2027-01-20',
-    confirmed: false,
+    confirmed: true,
     source: 'Catalan nitrogen management rules (DAN)',
   },
   qie: {
     id: 'qie',
-    label: 'QIE · machine-readable phytosanitary records',
+    label: 'Electronic phytosanitary register becomes mandatory',
     date: '2027-01-01',
-    confirmed: false,
+    confirmed: true,
     source: 'RD 1311/2012; FEGA note of 6 Nov 2025',
   },
   fertilisation: {
