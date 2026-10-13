@@ -27,7 +27,7 @@ export const ca: Messages = {
         fruit: 'Fruiters',
         olive: 'Olivera',
         vineyard: 'Vinya',
-        horticulture: 'Horta',
+        horticulture: 'Hortalisses',
         livestock: 'Ramaderia',
         other: 'Altres',
       },
